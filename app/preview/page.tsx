@@ -1,192 +1,279 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { useState } from 'react';
 
-function PreviewContent() {
-  const params = useSearchParams();
-  const encoded = params.get('d');
-  
-  let data: any = {
-    orderNumber: "071456",
-    clinic: "心絡", doctor: "張", patient: "陳芸綾",
-    age: "", gender: "女",
-    receiptDate: "6月23日", deliveryDate: "7月17日", deliveryTime: "18:00前",
-    zirconiaType: "Standard", zirconiaWork: ["Full Crown"],
-    emaxWork: [], implantType: "", implantMaterial: "",
-    implantConnect: "", implantBrand: "", implantSystem: "", implantSize: "",
-    other: ["3D Printer Model"], toothColor: "",
-    toothNotes: "6 | 6", connection: "單顆",
-    notes: "手術導板\n口掃+LT\n做成一組目"
+interface FormData {
+  clinic: string; doctor: string; patient: string; age: string; gender: string;
+  receiptDate: string; deliveryDate: string; deliveryTime: string;
+  zirconiaType: string; zirconiaWork: string[];
+  emaxWork: string[];
+  implantType: string; implantMaterial: string; screwCount: string; implantConnect: string;
+  other: string[];
+  screw: string; analog: string; transfer: string; abutment: string; scanBodies: string; tray: string;
+  implantBrand: string; implantSystem: string; implantSize: string;
+  toothColor: string; porcelainGingiva: boolean;
+  toothNotes: string; connection: string; notes: string;
+}
+
+export default function DentalForm() {
+  const [form, setForm] = useState<FormData>({
+    clinic: '', doctor: '', patient: '', age: '', gender: '',
+    receiptDate: '', deliveryDate: '', deliveryTime: '',
+    zirconiaType: '', zirconiaWork: [],
+    emaxWork: [],
+    implantType: '', implantMaterial: '', screwCount: '', implantConnect: '',
+    other: [],
+    screw: '', analog: '', transfer: '', abutment: '', scanBodies: '', tray: '',
+    implantBrand: '', implantSystem: '', implantSize: '',
+    toothColor: '', porcelainGingiva: false,
+    toothNotes: '', connection: '', notes: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const toggle = (field: keyof FormData, val: string) => {
+    setForm(f => ({
+      ...f,
+      [field]: (f[field] as string[]).includes(val)
+        ? (f[field] as string[]).filter((x: string) => x !== val)
+        : [...(f[field] as string[]), val]
+    }));
   };
 
-  if (encoded) {
-    try {
-      data = JSON.parse(Buffer.from(encoded, 'base64url').toString());
-    } catch(e) {}
-  }
+  const set = (field: keyof FormData, val: string | boolean) =>
+    setForm(f => ({ ...f, [field]: val }));
 
-  return (
-    <div className="bg-white min-h-screen p-4 font-sans text-sm" style={{maxWidth:'800px', margin:'0 auto'}}>
-      <div className="flex justify-between items-start border-b-2 border-black pb-2 mb-3">
-        <div className="text-xs text-gray-600 space-y-0.5">
-          <div>TEL：(02)2260-6101</div>
-          <div>FAX：(02)8262-5686</div>
-          <div>LINE：Caterpillar1721</div>
-          <div>地址：新北市土城區明德路一段313巷9號</div>
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">綠毛蟻牙體技術所</h1>
-        </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-red-600">NO: {data.orderNumber}</div>
-          <div className="text-xs mt-1">第一聯（白）牙技所留存</div>
-          <div className="text-xs">第二聯（紅）牙技所留存</div>
-          <div className="text-xs">第三聯（黃）診所留存</div>
-        </div>
-      </div>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form)
+    });
+    setLoading(false);
+    setDone(true);
+  };
 
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <table className="w-full border border-black text-xs">
-            <tbody>
-              <tr>
-                <td className="border border-black px-2 py-1 bg-gray-100 font-bold w-8" rowSpan={4}>基本資料</td>
-                <td className="border border-black px-2 py-1 w-16">診所</td>
-                <td className="border border-black px-2 py-1 font-bold">{data.clinic}</td>
-                <td className="border border-black px-2 py-1 w-16" rowSpan={2}>收付時間</td>
-                <td className="border border-black px-2 py-1">收件日：{data.receiptDate}</td>
-              </tr>
-              <tr>
-                <td className="border border-black px-2 py-1">醫師</td>
-                <td className="border border-black px-2 py-1 font-bold">{data.doctor}</td>
-                <td className="border border-black px-2 py-1">交件日：{data.deliveryDate}</td>
-              </tr>
-              <tr>
-                <td className="border border-black px-2 py-1">患者</td>
-                <td className="border border-black px-2 py-1 font-bold">{data.patient}</td>
-                <td className="border border-black px-2 py-1" rowSpan={2}>
-                  <div className="flex gap-2">
-                    <label><input type="checkbox" checked={data.deliveryTime==='12:00前'} readOnly /> 12:00前</label>
-                    <label><input type="checkbox" checked={data.deliveryTime==='18:00前'} readOnly /> 18:00前</label>
-                  </div>
-                  <div className="text-xs mt-1">※請務必勾選時間</div>
-                </td>
-                <td className="border border-black px-2 py-1"></td>
-              </tr>
-              <tr>
-                <td className="border border-black px-2 py-1">年齡</td>
-                <td className="border border-black px-2 py-1">{data.age} □男 {data.gender==='女'?'☑':'□'}女</td>
-                <td className="border border-black px-2 py-1"></td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className="border border-black mt-2 p-2">
-            <div className="font-bold italic text-base mb-1">Zirconia</div>
-            <div className="flex gap-3 text-xs mb-1">
-              <label><input type="checkbox" checked={data.zirconiaType==='Standard'} readOnly /> Standard</label>
-              <label><input type="checkbox" checked={data.zirconiaType==='3M Lava'} readOnly /> 3M Lava</label>
-            </div>
-            <div className="grid grid-cols-2 gap-1 text-xs">
-              {['Full Crown','咬鉻','燒瓷冠','Post'].map((w:string) => (
-                <label key={w}><input type="checkbox" checked={(data.zirconiaWork||[]).includes(w)} readOnly /> {w}</label>
-              ))}
-            </div>
-          </div>
-
-          <div className="border border-black mt-2 p-2">
-            <div className="font-bold italic text-base mb-1">E-Max</div>
-            <div className="grid grid-cols-2 gap-1 text-xs">
-              {['Full Crown','燒瓷冠','Veneer','In/onlay'].map((w:string) => (
-                <label key={w}><input type="checkbox" checked={(data.emaxWork||[]).includes(w)} readOnly /> {w}</label>
-              ))}
-            </div>
-          </div>
-
-          <div className="border border-black mt-2 p-2">
-            <div className="font-bold italic text-base mb-1">Other</div>
-            <div className="grid grid-cols-2 gap-1 text-xs">
-              {['Provisional (Temp)','美白牙托','3D Printer Model','Wax Up'].map((w:string) => (
-                <label key={w}><input type="checkbox" checked={(data.other||[]).includes(w)} readOnly /> {w}</label>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="w-56">
-          <div className="border border-black p-2">
-            <div className="font-bold italic text-base mb-1">Implant Type</div>
-            <div className="flex gap-2 text-xs mb-1">
-              {['Custom','Standard'].map((t:string) => (
-                <label key={t}><input type="checkbox" checked={data.implantType===t} readOnly /> {t}</label>
-              ))}
-            </div>
-            <div className="flex gap-2 text-xs mb-1">
-              {['Ti','Zr'].map((t:string) => (
-                <label key={t}><input type="checkbox" checked={data.implantMaterial===t} readOnly /> {t}</label>
-              ))}
-            </div>
-            <div className="text-xs mb-1">□ 加購Screw x____支</div>
-            <div className="text-xs mb-1"><label><input type="checkbox" checked={data.implantConnect==='Screw Type'} readOnly /> Screw Type</label></div>
-            <div className="text-xs"><label><input type="checkbox" checked={data.implantConnect==='Cement Type'} readOnly /> Cement Type</label></div>
-          </div>
-
-          <div className="border border-black mt-2 p-2">
-            <div className="font-bold italic text-base mb-1">Accessories</div>
-            <div className="text-xs space-y-1">
-              {['Screw','Analog','Transfer','Abutment','Scan bodies','Tray'].map((l:string) => (
-                <div key={l} className="flex justify-between">
-                  <span>□ {l}</span><span>x ____支</span>
-                </div>
-              ))}
-            </div>
-            <div className="text-xs mt-2 space-y-1">
-              <div>植體廠牌：{data.implantBrand || '___________'}</div>
-              <div>植體系統：{data.implantSystem || '___________'}</div>
-              <div>植體尺寸：{data.implantSize || '___________'}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="border border-black mt-2 flex">
-        <div className="flex-1 p-2 border-r border-black">
-          <div className="text-xs font-bold mb-2">牙位</div>
-          <div className="flex justify-center gap-1 my-2">
-            {[8,7,6,5,4,3,2,1,1,2,3,4,5,6,7,8].map((n:number,i:number) => (
-              <div key={i} className="w-6 h-8 border border-black rounded-t-full bg-gray-100 flex items-end justify-center text-xs pb-0.5">{n}</div>
-            ))}
-          </div>
-          <div className="border-t border-black my-1"></div>
-          <div className="text-center text-xs mt-1 font-bold">{data.toothNotes}</div>
-          <div className="mt-3 text-xs space-y-1">
-            {['單顆','連接','收到Case請回電與Dr.討論'].map((c:string) => (
-              <label key={c} className="flex items-center gap-1">
-                <input type="radio" checked={data.connection===c} readOnly /> {c}
-              </label>
-            ))}
-          </div>
-        </div>
-        <div className="w-48 p-2">
-          <div className="text-xs font-bold mb-1">備註</div>
-          <div className="text-sm whitespace-pre-line">{data.notes}</div>
-        </div>
-      </div>
-
-      <div className="mt-4 text-center print:hidden">
-        <button onClick={() => window.print()}
-          className="px-8 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
-          列印指示單
-        </button>
+  if (done) return (
+    <div className="min-h-screen flex items-center justify-center bg-green-50">
+      <div className="text-center">
+        <div className="text-6xl mb-4">✅</div>
+        <h1 className="text-2xl font-bold text-green-700">指示單已送出！</h1>
+        <p className="text-gray-500 mt-2">牙技所將收到 LINE 通知</p>
+        <button onClick={() => setDone(false)} className="mt-6 px-6 py-2 bg-green-600 text-white rounded-lg">再填一張</button>
       </div>
     </div>
   );
-}
 
-export default function Preview() {
   return (
-    <Suspense fallback={<div className="p-8 text-center">載入中...</div>}>
-      <PreviewContent />
-    </Suspense>
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-8">
+
+        <div className="text-center border-b pb-6">
+          <h1 className="text-3xl font-bold text-gray-800">綠毛蟻牙體技術所</h1>
+          <p className="text-gray-500 mt-1">線上指示單</p>
+        </div>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-blue-500 pl-3">基本資料</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {(['clinic', 'doctor', 'patient'] as const).map((k) => (
+              <div key={k}>
+                <label className="text-sm text-gray-600">{k === 'clinic' ? '診所' : k === 'doctor' ? '醫師' : '患者'}</label>
+                <input value={form[k]} onChange={e => set(k, e.target.value)}
+                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+            ))}
+            <div>
+              <label className="text-sm text-gray-600">年齡</label>
+              <input value={form.age} onChange={e => set('age', e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600">性別</label>
+              <div className="flex gap-4 mt-2">
+                {['男', '女'].map(g => (
+                  <label key={g} className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="gender" value={g} checked={form.gender === g} onChange={e => set('gender', e.target.value)} />
+                    <span>{g}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-blue-500 pl-3">收付日期</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm text-gray-600">收件日</label>
+              <input type="date" value={form.receiptDate} onChange={e => set('receiptDate', e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 mt-1" />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600">交件日</label>
+              <input type="date" value={form.deliveryDate} onChange={e => set('deliveryDate', e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 mt-1" />
+            </div>
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">交件時間</label>
+              <div className="flex gap-4">
+                {['12:00前', '18:00前'].map(t => (
+                  <label key={t} className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="deliveryTime" value={t} checked={form.deliveryTime === t} onChange={e => set('deliveryTime', e.target.value)} />
+                    <span>{t}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-purple-500 pl-3">Zirconia</h2>
+          <div className="flex gap-6 mb-3">
+            {['Standard', '3M Lava'].map(t => (
+              <label key={t} className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="zType" value={t} checked={form.zirconiaType === t} onChange={e => set('zirconiaType', e.target.value)} />
+                <span>{t}</span>
+              </label>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-4">
+            {['Full Crown', '咬鉻', '燒瓷冠', 'Post'].map(w => (
+              <label key={w} className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.zirconiaWork.includes(w)} onChange={() => toggle('zirconiaWork', w)} />
+                <span>{w}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-pink-500 pl-3">E-Max</h2>
+          <div className="flex flex-wrap gap-4">
+            {['Full Crown', '燒瓷冠', 'Veneer', 'In/onlay'].map(w => (
+              <label key={w} className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.emaxWork.includes(w)} onChange={() => toggle('emaxWork', w)} />
+                <span>{w}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-green-500 pl-3">Implant Type</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex gap-4">
+              {['Custom', 'Standard'].map(t => (
+                <label key={t} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="iType" value={t} checked={form.implantType === t} onChange={e => set('implantType', e.target.value)} />
+                  <span>{t}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex gap-4">
+              {['Ti', 'Zr'].map(t => (
+                <label key={t} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="iMat" value={t} checked={form.implantMaterial === t} onChange={e => set('implantMaterial', e.target.value)} />
+                  <span>{t}</span>
+                </label>
+              ))}
+            </div>
+            <div>
+              <label className="text-sm text-gray-600">加購 Screw 數量</label>
+              <input value={form.screwCount} onChange={e => set('screwCount', e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="支" />
+            </div>
+            <div className="flex gap-4 items-center">
+              {['Screw Type', 'Cement Type'].map(t => (
+                <label key={t} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="iConn" value={t} checked={form.implantConnect === t} onChange={e => set('implantConnect', e.target.value)} />
+                  <span>{t}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            {(['implantBrand', 'implantSystem', 'implantSize'] as const).map((k) => (
+              <div key={k}>
+                <label className="text-sm text-gray-600">{k === 'implantBrand' ? '植體廠牌' : k === 'implantSystem' ? '植體系統' : '植體尺寸'}</label>
+                <input value={form[k]} onChange={e => set(k, e.target.value)}
+                  className="w-full border rounded-lg px-3 py-2 mt-1" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-yellow-500 pl-3">Other</h2>
+          <div className="flex flex-wrap gap-4">
+            {['Provisional (Temp)', '美白牙托', '3D Printer Model', 'Wax Up'].map(w => (
+              <label key={w} className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.other.includes(w)} onChange={() => toggle('other', w)} />
+                <span>{w}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-orange-500 pl-3">Accessories</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {(['screw', 'analog', 'transfer', 'abutment', 'scanBodies', 'tray'] as const).map((k) => (
+              <div key={k} className="flex items-center gap-2">
+                <label className="text-sm text-gray-600 w-24">{k === 'screw' ? 'Screw' : k === 'analog' ? 'Analog' : k === 'transfer' ? 'Transfer' : k === 'abutment' ? 'Abutment' : k === 'scanBodies' ? 'Scan Bodies' : 'Tray'}</label>
+                <input value={form[k]} onChange={e => set(k, e.target.value)}
+                  className="flex-1 border rounded-lg px-2 py-1 text-sm" placeholder="數量" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-red-400 pl-3">齒色</h2>
+          <div>
+            <label className="text-sm text-gray-600">齒色色號</label>
+            <input value={form.toothColor} onChange={e => set('toothColor', e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：A2" />
+          </div>
+          <label className="flex items-center gap-2 mt-3 cursor-pointer">
+            <input type="checkbox" checked={form.porcelainGingiva} onChange={e => set('porcelainGingiva', e.target.checked)} />
+            <span className="text-sm">Porcelain Gingiva</span>
+          </label>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-gray-500 pl-3">牙位 & 備註</h2>
+          <div>
+            <label className="text-sm text-gray-600">牙位說明</label>
+            <input value={form.toothNotes} onChange={e => set('toothNotes', e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：#14 #15" />
+          </div>
+          <div className="mt-4">
+            <label className="text-sm text-gray-600 block mb-2">連接方式</label>
+            <div className="flex gap-6">
+              {['單顆', '連接', '收到Case請回電與Dr.討論'].map(c => (
+                <label key={c} className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="conn" value={c} checked={form.connection === c} onChange={e => set('connection', e.target.value)} />
+                  <span className="text-sm">{c}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="text-sm text-gray-600">特殊指示</label>
+            <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={3}
+              className="w-full border rounded-lg px-3 py-2 mt-1 resize-none" placeholder="手術導板、口掃 + LT..." />
+          </div>
+        </section>
+
+        <button type="submit" disabled={loading}
+          className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-xl transition disabled:opacity-50">
+          {loading ? '送出中...' : '送出指示單 →'}
+        </button>
+      </form>
+    </div>
   );
 }
