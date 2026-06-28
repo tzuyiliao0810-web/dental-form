@@ -1,9 +1,9 @@
 'use client';
 
-/* FDI 牙位編號（依照實體表單的牙齒圖排列） */
-// 上排：左半 Q2(28→21)、右半 Q1(11→18)
-const UPPER_LEFT = ['28', '27', '26', '25', '24', '23', '22', '21'];
-const UPPER_RIGHT = ['11', '12', '13', '14', '15', '16', '17', '18'];
+/* FDI 牙位編號（牙醫視角：面對患者，畫面左 = 患者右） */
+// 上排：左半 Q1(18→11)、右半 Q2(21→28)
+const UPPER_LEFT = ['18', '17', '16', '15', '14', '13', '12', '11'];
+const UPPER_RIGHT = ['21', '22', '23', '24', '25', '26', '27', '28'];
 // 下排：左半 Q4(48→41)、右半 Q3(31→38)
 const LOWER_LEFT = ['48', '47', '46', '45', '44', '43', '42', '41'];
 const LOWER_RIGHT = ['31', '32', '33', '34', '35', '36', '37', '38'];
@@ -99,18 +99,18 @@ export default function ToothChart({
 }) {
   return (
     <div className="inline-block">
-      {/* 右上 / 左上（病人視角，圖面左為左象限） */}
+      {/* 牙醫視角：左=患者右(Q1)、右=患者左(Q2) */}
       <div className="flex justify-between text-[10px] text-gray-400 px-1 mb-0.5">
-        <span>左上</span>
         <span>右上</span>
+        <span>左上</span>
       </div>
       <Row left={UPPER_LEFT} right={UPPER_RIGHT} selected={selected} readOnly={readOnly} onToggle={onToggle} />
       {/* 上下分隔（咬合線） */}
       <div className="border-t-2 border-gray-400 my-1.5" />
       <Row left={LOWER_LEFT} right={LOWER_RIGHT} selected={selected} readOnly={readOnly} onToggle={onToggle} />
       <div className="flex justify-between text-[10px] text-gray-400 px-1 mt-0.5">
-        <span>左下</span>
         <span>右下</span>
+        <span>左下</span>
       </div>
     </div>
   );
