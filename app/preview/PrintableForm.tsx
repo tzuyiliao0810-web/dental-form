@@ -214,9 +214,14 @@ export default function PrintableForm({ data }: { data: any }) {
           <div className="text-center text-[12px] mt-1">補充：{d.toothNotes}</div>
         ) : null}
         <div className="flex flex-wrap gap-6 mt-3 text-[12px]">
-          <Rd on={d.connection === '單顆'}>單顆</Rd>
-          <Rd on={d.connection === '連接'}>連接</Rd>
-          <Rd on={d.connection === '收到Case請回電與Dr.討論'}>收到Case 請回電與Dr.討論</Rd>
+          {(() => {
+            const conn: string[] = Array.isArray(d.connection) ? d.connection : (d.connection ? [d.connection] : []);
+            return <>
+              <Ck on={conn.includes('單顆')}>單顆</Ck>
+              <Ck on={conn.includes('連接')}>連接</Ck>
+              <Ck on={conn.includes('收到Case請回電與Dr.討論')}>收到Case 請回電與Dr.討論</Ck>
+            </>;
+          })()}
         </div>
         {d.notes ? (
           <div className="mt-2 text-[12px] whitespace-pre-line border-t border-dashed border-gray-400 pt-1">備註：{d.notes}</div>

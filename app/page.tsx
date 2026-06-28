@@ -12,7 +12,7 @@ type Form = {
   gap: string; grooveStain: string; toothColor: string; porcelainGingiva: boolean;
   screw: string; analog: string; transfer: string; abutment: string; scanBodies: string; tray: string;
   implantBrand: string; implantSystem: string; implantSize: string;
-  teeth: string[]; toothNotes: string; connection: string; notes: string;
+  teeth: string[]; toothNotes: string; connection: string[]; notes: string;
 };
 
 const initialForm: Form = {
@@ -25,7 +25,7 @@ const initialForm: Form = {
   gap: '', grooveStain: '', toothColor: '', porcelainGingiva: false,
   screw: '', analog: '', transfer: '', abutment: '', scanBodies: '', tray: '',
   implantBrand: '', implantSystem: '', implantSize: '',
-  teeth: [], toothNotes: '', connection: '', notes: '',
+  teeth: [], toothNotes: '', connection: [], notes: '',
 };
 
 export default function DentalForm() {
@@ -97,7 +97,7 @@ export default function DentalForm() {
                 {['男', '女'].map(g => (
                   <label key={g} className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="gender" value={g} checked={form.gender === g} onChange={e => set('gender', e.target.value)} />
-                    <span>{g}</span>
+                    <span className="text-sm font-medium text-gray-900">{g}</span>
                   </label>
                 ))}
               </div>
@@ -125,7 +125,7 @@ export default function DentalForm() {
                 {['12:00前', '18:00前'].map(t => (
                   <label key={t} className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="deliveryTime" value={t} checked={form.deliveryTime === t} onChange={e => set('deliveryTime', e.target.value)} />
-                    <span>{t}</span>
+                    <span className="text-sm font-medium text-gray-900">{t}</span>
                   </label>
                 ))}
               </div>
@@ -148,7 +148,7 @@ export default function DentalForm() {
             {['Full Crown', '咬鉻', '燒瓷冠', 'Post'].map(w => (
               <label key={w} className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={arrField('zirconiaWork').includes(w)} onChange={() => toggle('zirconiaWork', w)} />
-                <span>{w}</span>
+                <span className="text-sm font-medium text-gray-900">{w}</span>
               </label>
             ))}
           </div>
@@ -161,7 +161,7 @@ export default function DentalForm() {
             {['Full Crown', '燒瓷冠', 'Veneer', 'In/onlay'].map(w => (
               <label key={w} className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={arrField('emaxWork').includes(w)} onChange={() => toggle('emaxWork', w)} />
-                <span>{w}</span>
+                <span className="text-sm font-medium text-gray-900">{w}</span>
               </label>
             ))}
           </div>
@@ -210,7 +210,7 @@ export default function DentalForm() {
             {['Provisional (Temp)', '美白牙托', '3D Printer Model', 'Wax Up'].map(w => (
               <label key={w} className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={arrField('other').includes(w)} onChange={() => toggle('other', w)} />
-                <span>{w}</span>
+                <span className="text-sm font-medium text-gray-900">{w}</span>
               </label>
             ))}
           </div>
@@ -226,7 +226,7 @@ export default function DentalForm() {
                 {['補強', '正常', '打開'].map(t => (
                   <label key={t} className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="gap" value={t} checked={form.gap === t} onChange={e => set('gap', e.target.value)} />
-                    <span>{t}</span>
+                    <span className="text-sm font-medium text-gray-900">{t}</span>
                   </label>
                 ))}
               </div>
@@ -237,7 +237,7 @@ export default function DentalForm() {
                 {['輕', '中', '重'].map(t => (
                   <label key={t} className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="grooveStain" value={t} checked={form.grooveStain === t} onChange={e => set('grooveStain', e.target.value)} />
-                    <span>{t}</span>
+                    <span className="text-sm font-medium text-gray-900">{t}</span>
                   </label>
                 ))}
               </div>
@@ -249,7 +249,7 @@ export default function DentalForm() {
             </div>
             <label className="flex items-center gap-2 mt-7 cursor-pointer">
               <input type="checkbox" checked={form.porcelainGingiva} onChange={e => set('porcelainGingiva', e.target.checked)} />
-              <span className="text-sm">Porcelain Gingiva</span>
+              <span className="text-sm font-medium text-gray-900">Porcelain Gingiva</span>
             </label>
           </div>
         </section>
@@ -297,12 +297,12 @@ export default function DentalForm() {
               className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：橋體、特殊指示…" />
           </div>
           <div className="mt-4">
-            <label className="text-sm text-gray-600 block mb-2">連接方式</label>
+            <label className="text-sm font-medium text-gray-900 block mb-2">連接方式（可複選）</label>
             <div className="flex flex-wrap gap-6">
               {['單顆', '連接', '收到Case請回電與Dr.討論'].map(c => (
                 <label key={c} className="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="conn" value={c} checked={form.connection === c} onChange={e => set('connection', e.target.value)} />
-                  <span className="text-sm">{c}</span>
+                  <input type="checkbox" checked={arrField('connection').includes(c)} onChange={() => toggle('connection', c)} />
+                  <span className="text-sm font-medium text-gray-900">{c}</span>
                 </label>
               ))}
             </div>
