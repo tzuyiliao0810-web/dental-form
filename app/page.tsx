@@ -81,18 +81,18 @@ export default function DentalForm() {
           <div className="grid grid-cols-2 gap-4">
             {([['clinic', '診所'], ['doctor', '醫師'], ['patient', '患者']] as const).map(([k, l]) => (
               <div key={k}>
-                <label className="text-sm text-gray-600">{l}</label>
+                <label className="text-sm font-medium text-gray-900">{l}</label>
                 <input value={form[k] as string} onChange={e => set(k, e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300" />
               </div>
             ))}
             <div>
-              <label className="text-sm text-gray-600">年齡</label>
+              <label className="text-sm font-medium text-gray-900">年齡</label>
               <input value={form.age} onChange={e => set('age', e.target.value)}
                 className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
             <div>
-              <label className="text-sm text-gray-600">性別</label>
+              <label className="text-sm font-medium text-gray-900">性別</label>
               <div className="flex gap-4 mt-2">
                 {['男', '女'].map(g => (
                   <label key={g} className="flex items-center gap-2 cursor-pointer">
@@ -110,17 +110,17 @@ export default function DentalForm() {
           <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-blue-500 pl-3">收付時間</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm text-gray-600">收件日</label>
+              <label className="text-sm font-medium text-gray-900">收件日</label>
               <input type="date" value={form.receiptDate} onChange={e => set('receiptDate', e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 mt-1" />
+                className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900" />
             </div>
             <div>
-              <label className="text-sm text-gray-600">交件日</label>
+              <label className="text-sm font-medium text-gray-900">交件日</label>
               <input type="date" value={form.deliveryDate} onChange={e => set('deliveryDate', e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 mt-1" />
+                className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900" />
             </div>
             <div>
-              <label className="text-sm text-gray-600 block mb-2">交件時間（請務必勾選）</label>
+              <label className="text-sm font-medium text-gray-900 block mb-2">交件時間（請務必勾選）</label>
               <div className="flex gap-4">
                 {['12:00前', '18:00前'].map(t => (
                   <label key={t} className="flex items-center gap-2 cursor-pointer">
@@ -140,7 +140,7 @@ export default function DentalForm() {
             {['Standard', '3M Lava'].map(t => (
               <label key={t} className="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="zType" value={t} checked={form.zirconiaType === t} onChange={e => set('zirconiaType', e.target.value)} />
-                <span>{t}</span>
+                <span className="text-sm font-medium text-gray-900">{t}</span>
               </label>
             ))}
           </div>
@@ -175,7 +175,7 @@ export default function DentalForm() {
               {['Custom', 'Standard'].map(t => (
                 <label key={t} className="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="iType" value={t} checked={form.implantType === t} onChange={e => set('implantType', e.target.value)} />
-                  <span>{t}</span>
+                  <span className="text-sm font-medium text-gray-900">{t}</span>
                 </label>
               ))}
             </div>
@@ -183,12 +183,12 @@ export default function DentalForm() {
               {['Ti', 'Zr'].map(t => (
                 <label key={t} className="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="iMat" value={t} checked={form.implantMaterial === t} onChange={e => set('implantMaterial', e.target.value)} />
-                  <span>{t}</span>
+                  <span className="text-sm font-medium text-gray-900">{t}</span>
                 </label>
               ))}
             </div>
             <div>
-              <label className="text-sm text-gray-600">加購 Screw 數量</label>
+              <label className="text-sm font-medium text-gray-900">加購 Screw 數量</label>
               <input value={form.screwCount} onChange={e => set('screwCount', e.target.value)}
                 className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="支" />
             </div>
@@ -196,7 +196,7 @@ export default function DentalForm() {
               {['Screw Type', 'Cement Type'].map(t => (
                 <label key={t} className="flex items-center gap-2 cursor-pointer">
                   <input type="radio" name="iConn" value={t} checked={form.implantConnect === t} onChange={e => set('implantConnect', e.target.value)} />
-                  <span>{t}</span>
+                  <span className="text-sm font-medium text-gray-900">{t}</span>
                 </label>
               ))}
             </div>
@@ -221,7 +221,7 @@ export default function DentalForm() {
           <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-teal-500 pl-3">牙縫 / 牙溝染色 / 齒色</h2>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="text-sm text-gray-600 block mb-2">牙縫</label>
+              <label className="text-sm font-medium text-gray-900 block mb-2">牙縫</label>
               <div className="flex gap-4">
                 {['補強', '正常', '打開'].map(t => (
                   <label key={t} className="flex items-center gap-2 cursor-pointer">
@@ -232,7 +232,7 @@ export default function DentalForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-600 block mb-2">牙溝染色</label>
+              <label className="text-sm font-medium text-gray-900 block mb-2">牙溝染色</label>
               <div className="flex gap-4">
                 {['輕', '中', '重'].map(t => (
                   <label key={t} className="flex items-center gap-2 cursor-pointer">
@@ -243,7 +243,7 @@ export default function DentalForm() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-600">齒色（色號）</label>
+              <label className="text-sm font-medium text-gray-900">齒色（色號）</label>
               <input value={form.toothColor} onChange={e => set('toothColor', e.target.value)}
                 className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：A2" />
             </div>
@@ -260,7 +260,7 @@ export default function DentalForm() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
             {([['screw', 'Screw'], ['analog', 'Analog'], ['transfer', 'Transfer'], ['abutment', 'Abutment'], ['scanBodies', 'Scan bodies'], ['tray', 'Tray']] as const).map(([k, l]) => (
               <div key={k} className="flex flex-col">
-                <label className="text-sm text-gray-600 mb-1 truncate">{l}</label>
+                <label className="text-sm font-medium text-gray-900 mb-1 truncate">{l}</label>
                 <input value={form[k] as string} onChange={e => set(k, e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="數量" />
               </div>
@@ -269,7 +269,7 @@ export default function DentalForm() {
           <div className="grid grid-cols-3 gap-3 mt-4">
             {([['implantBrand', '植體廠牌'], ['implantSystem', '植體系統'], ['implantSize', '植體尺寸']] as const).map(([k, l]) => (
               <div key={k}>
-                <label className="text-sm text-gray-600">{l}</label>
+                <label className="text-sm font-medium text-gray-900">{l}</label>
                 <input value={form[k] as string} onChange={e => set(k, e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 mt-1" />
               </div>
@@ -281,7 +281,7 @@ export default function DentalForm() {
         <section>
           <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-gray-500 pl-3">牙位 &amp; 備註</h2>
           <div>
-            <label className="text-sm text-gray-600 block mb-2">齒位（點選牙齒，可多選）</label>
+            <label className="text-sm font-medium text-gray-900 block mb-2">齒位（點選牙齒，可多選）</label>
             <div className="overflow-x-auto pb-2">
               <div className="border rounded-xl p-3 bg-gray-50 inline-block min-w-full">
                 <ToothChart selected={form.teeth} onToggle={(n) => toggle('teeth', n)} />
@@ -292,7 +292,7 @@ export default function DentalForm() {
             </div>
           </div>
           <div className="mt-4">
-            <label className="text-sm text-gray-600">齒位補充說明（選填）</label>
+            <label className="text-sm font-medium text-gray-900">齒位補充說明（選填）</label>
             <input value={form.toothNotes} onChange={e => set('toothNotes', e.target.value)}
               className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：橋體、特殊指示…" />
           </div>
@@ -308,7 +308,7 @@ export default function DentalForm() {
             </div>
           </div>
           <div className="mt-4">
-            <label className="text-sm text-gray-600">特殊指示 / 備註</label>
+            <label className="text-sm font-medium text-gray-900">特殊指示 / 備註</label>
             <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={3}
               className="w-full border rounded-lg px-3 py-2 mt-1 resize-none" placeholder="手術導板、口掃 + LT..." />
           </div>
