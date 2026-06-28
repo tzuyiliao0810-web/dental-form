@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import ToothChart from './components/ToothChart';
 
 type Form = {
   clinic: string; doctor: string; patient: string; age: string; gender: string;
@@ -11,7 +12,7 @@ type Form = {
   gap: string; grooveStain: string; toothColor: string; porcelainGingiva: boolean;
   screw: string; analog: string; transfer: string; abutment: string; scanBodies: string; tray: string;
   implantBrand: string; implantSystem: string; implantSize: string;
-  toothNotes: string; connection: string; notes: string;
+  teeth: string[]; toothNotes: string; connection: string; notes: string;
 };
 
 const initialForm: Form = {
@@ -24,7 +25,7 @@ const initialForm: Form = {
   gap: '', grooveStain: '', toothColor: '', porcelainGingiva: false,
   screw: '', analog: '', transfer: '', abutment: '', scanBodies: '', tray: '',
   implantBrand: '', implantSystem: '', implantSize: '',
-  toothNotes: '', connection: '', notes: '',
+  teeth: [], toothNotes: '', connection: '', notes: '',
 };
 
 export default function DentalForm() {
@@ -256,12 +257,12 @@ export default function DentalForm() {
         {/* Accessories */}
         <section>
           <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-orange-500 pl-3">Accessories（數量）</h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3">
             {([['screw', 'Screw'], ['analog', 'Analog'], ['transfer', 'Transfer'], ['abutment', 'Abutment'], ['scanBodies', 'Scan bodies'], ['tray', 'Tray']] as const).map(([k, l]) => (
-              <div key={k} className="flex items-center gap-2">
-                <label className="text-sm text-gray-600 w-24">{l}</label>
+              <div key={k} className="flex flex-col">
+                <label className="text-sm text-gray-600 mb-1 truncate">{l}</label>
                 <input value={form[k] as string} onChange={e => set(k, e.target.value)}
-                  className="flex-1 border rounded-lg px-2 py-1 text-sm" placeholder="數量" />
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="數量" />
               </div>
             ))}
           </div>
@@ -280,9 +281,20 @@ export default function DentalForm() {
         <section>
           <h2 className="text-lg font-bold text-gray-700 mb-4 border-l-4 border-gray-500 pl-3">牙位 &amp; 備註</h2>
           <div>
-            <label className="text-sm text-gray-600">牙位</label>
+            <label className="text-sm text-gray-600 block mb-2">齒位（點選牙齒，可多選）</label>
+            <div className="overflow-x-auto pb-2">
+              <div className="border rounded-xl p-3 bg-gray-50 inline-block min-w-full">
+                <ToothChart selected={form.teeth} onToggle={(n) => toggle('teeth', n)} />
+              </div>
+            </div>
+            <div className="mt-2 text-sm text-gray-500">
+              已選：{form.teeth.length ? form.teeth.join('、') : '（尚未選擇）'}
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="text-sm text-gray-600">齒位補充說明（選填）</label>
             <input value={form.toothNotes} onChange={e => set('toothNotes', e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：#14 #15 或 6 | 6" />
+              className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：橋體、特殊指示…" />
           </div>
           <div className="mt-4">
             <label className="text-sm text-gray-600 block mb-2">連接方式</label>

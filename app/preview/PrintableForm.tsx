@@ -1,5 +1,7 @@
 'use client';
 
+import ToothChart from '../components/ToothChart';
+
 /* 小方框（checkbox） */
 function Ck({ on, children }: { on?: boolean; children?: React.ReactNode }) {
   return (
@@ -30,6 +32,7 @@ function fill(v: unknown, width = 8) {
 export default function PrintableForm({ data }: { data: any }) {
   const d = data || {};
   const arr = (k: string): string[] => Array.isArray(d[k]) ? d[k] : [];
+  const teeth: string[] = Array.isArray(d.teeth) ? d.teeth : [];
 
   return (
     <div className="bg-white min-h-screen px-3 py-4 text-[13px] text-black"
@@ -204,13 +207,12 @@ export default function PrintableForm({ data }: { data: any }) {
       {/* ===== 牙位 ===== */}
       <div className="border border-black mt-2 p-3">
         <div className="text-center text-[12px] font-bold mb-1">齒位</div>
-        <div className="relative mx-auto" style={{ maxWidth: '420px', height: '70px' }}>
-          <div className="absolute left-0 right-0 top-1/2 border-t border-black" />
-          <div className="absolute top-0 bottom-0 left-1/2 border-l border-black" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="bg-white px-3 text-[15px] font-bold">{d.toothNotes}</span>
-          </div>
+        <div className="flex justify-center my-1">
+          <ToothChart selected={teeth} readOnly />
         </div>
+        {d.toothNotes ? (
+          <div className="text-center text-[12px] mt-1">補充：{d.toothNotes}</div>
+        ) : null}
         <div className="flex flex-wrap gap-6 mt-3 text-[12px]">
           <Rd on={d.connection === '單顆'}>單顆</Rd>
           <Rd on={d.connection === '連接'}>連接</Rd>

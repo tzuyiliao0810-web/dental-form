@@ -14,7 +14,7 @@ const defaultData = {
   gap: '正常', grooveStain: '中', toothColor: 'A2', porcelainGingiva: false,
   screw: '', analog: '', transfer: '', abutment: '', scanBodies: '', tray: '',
   implantBrand: '', implantSystem: '', implantSize: '',
-  toothNotes: '6 | 6', connection: '單顆',
+  teeth: ['16', '14'], toothNotes: '', connection: '單顆',
   notes: '手術導板\n口掃+LT\n做成一組目',
 };
 
