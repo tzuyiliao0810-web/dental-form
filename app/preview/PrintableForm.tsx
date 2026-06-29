@@ -35,25 +35,35 @@ export default function PrintableForm({ data }: { data: any }) {
   const teeth: string[] = Array.isArray(d.teeth) ? d.teeth : [];
 
   return (
-    <div className="bg-white min-h-screen px-3 py-4 text-[13px] text-black"
+    <div className="bg-white px-3 py-2 text-[13px] text-black"
       style={{ maxWidth: '820px', margin: '0 auto', fontFamily: 'system-ui, "PingFang TC", "Microsoft JhengHei", sans-serif' }}>
 
+      {/* 列印樣式：強制單頁、隱藏按鈕 */}
+      <style>{`
+        @media print {
+          @page { size: A4; margin: 8mm; }
+          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          * { page-break-inside: avoid !important; }
+          html, body { height: auto !important; }
+        }
+      `}</style>
+
       {/* ===== 抬頭 ===== */}
-      <div className="flex justify-between items-start border-b-2 border-black pb-2 mb-2">
-        <div className="text-[11px] leading-5">
+      <div className="flex justify-between items-center border-b-2 border-black pb-1 mb-2">
+        {/* 左：聯絡資訊，字小、行距緊 */}
+        <div className="text-[9px] leading-[14px]">
           <div>TEL：(02)2260-6101</div>
           <div>FAX：(02)8262-5686</div>
           <div>LINE：Caterpillar1721</div>
           <div>地址：新北市土城區明德路一段313巷9號</div>
         </div>
-        <div className="text-center pt-1">
-          <h1 className="text-[26px] font-bold tracking-wide" style={{ fontFamily: '"KaiTi", "DFKai-SB", serif' }}>綠毛蟲牙體技術所</h1>
+        {/* 中：店名 */}
+        <div className="text-center">
+          <h1 className="text-[24px] font-bold tracking-wide" style={{ fontFamily: '"KaiTi", "DFKai-SB", serif' }}>綠毛蟲牙體技術所</h1>
         </div>
-        <div className="text-right text-[11px] leading-5">
-          <div className="text-[22px] font-bold text-red-600 leading-tight">NO：{d.orderNumber}</div>
-          <div>第一聯（白）牙技所留存</div>
-          <div>第二聯（紅）牙技所留存</div>
-          <div>第三聯（黃）診所留存</div>
+        {/* 右：單號（刪除三聯說明，縮小30%：22px→15px） */}
+        <div className="text-right">
+          <div className="text-[15px] font-bold text-red-600 leading-tight">NO：{d.orderNumber}</div>
         </div>
       </div>
 
@@ -229,7 +239,7 @@ export default function PrintableForm({ data }: { data: any }) {
       </div>
 
       {/* 列印按鈕（列印時隱藏） */}
-      <div className="mt-4 text-center print:hidden">
+      <div className="mt-3 text-center print:hidden">
         <button onClick={() => window.print()}
           className="px-8 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
           列印指示單
