@@ -67,7 +67,7 @@ export default function DentalForm() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-8">
+      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-8 text-gray-900" style={{ color: '#111827' }}>
 
         {/* 標題 */}
         <div className="text-center border-b pb-6">
@@ -83,13 +83,13 @@ export default function DentalForm() {
               <div key={k}>
                 <label className="text-sm font-medium text-gray-900">{l}</label>
                 <input value={form[k] as string} onChange={e => set(k, e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                  className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300" />
               </div>
             ))}
             <div>
               <label className="text-sm font-medium text-gray-900">年齡</label>
               <input value={form.age} onChange={e => set('age', e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
             <div>
               <label className="text-sm font-medium text-gray-900">性別</label>
@@ -190,7 +190,7 @@ export default function DentalForm() {
             <div>
               <label className="text-sm font-medium text-gray-900">加購 Screw 數量</label>
               <input value={form.screwCount} onChange={e => set('screwCount', e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="支" />
+                className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900" placeholder="支" />
             </div>
             <div className="flex gap-4 items-center">
               {['Screw Type', 'Cement Type'].map(t => (
@@ -245,7 +245,7 @@ export default function DentalForm() {
             <div>
               <label className="text-sm font-medium text-gray-900">齒色（色號）</label>
               <input value={form.toothColor} onChange={e => set('toothColor', e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：A2" />
+                className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900" placeholder="例：A2" />
             </div>
             <label className="flex items-center gap-2 mt-7 cursor-pointer">
               <input type="checkbox" checked={form.porcelainGingiva} onChange={e => set('porcelainGingiva', e.target.checked)} />
@@ -271,7 +271,7 @@ export default function DentalForm() {
               <div key={k}>
                 <label className="text-sm font-medium text-gray-900">{l}</label>
                 <input value={form[k] as string} onChange={e => set(k, e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 mt-1" />
+                  className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900" />
               </div>
             ))}
           </div>
@@ -294,7 +294,7 @@ export default function DentalForm() {
           <div className="mt-4">
             <label className="text-sm font-medium text-gray-900">齒位補充說明（選填）</label>
             <input value={form.toothNotes} onChange={e => set('toothNotes', e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 mt-1" placeholder="例：橋體、特殊指示…" />
+              className="w-full border rounded-lg px-3 py-2 mt-1 text-gray-900" placeholder="例：橋體、特殊指示…" />
           </div>
           <div className="mt-4">
             <label className="text-sm font-medium text-gray-900 block mb-2">連接方式（可複選）</label>
@@ -310,7 +310,7 @@ export default function DentalForm() {
           <div className="mt-4">
             <label className="text-sm font-medium text-gray-900">特殊指示 / 備註</label>
             <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={3}
-              className="w-full border rounded-lg px-3 py-2 mt-1 resize-none" placeholder="手術導板、口掃 + LT..." />
+              className="w-full border rounded-lg px-3 py-2 mt-1 resize-none text-gray-900" placeholder="手術導板、口掃 + LT..." />
           </div>
         </section>
 
