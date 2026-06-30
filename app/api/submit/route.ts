@@ -36,12 +36,16 @@ export async function POST(req: Request) {
     }
   }
 
+  const timeLabel = data.deliveryTime === '正確裝戴時間'
+    ? `正確裝戴時間（${data.fittingDate || '未填日期'}）`
+    : data.deliveryTime;
+
   const message = `📋 新指示單 ${orderNumber}
 
 🏥 診所：${data.clinic}
 👨‍⚕️ 醫師：${data.doctor}
 🧑 患者：${data.patient}（${data.gender}）
-📅 交件日：${data.deliveryDate} ${data.deliveryTime}
+📅 交件日：${data.deliveryDate} ${timeLabel}
 
 👉 點此查看並列印指示單：
 ${previewUrl}`;
