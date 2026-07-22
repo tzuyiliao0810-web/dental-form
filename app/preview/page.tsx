@@ -1,6 +1,7 @@
 import PrintableForm from './PrintableForm';
 import { getSupabaseAdmin, supabaseEnabled } from '@/lib/supabase';
-
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 // 預設示範資料：當沒有 id、沒有 d、或資料庫查不到時使用。
 const defaultData = {
   orderNumber: '058438',
