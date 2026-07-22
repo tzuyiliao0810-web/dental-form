@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin, supabaseEnabled } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
   const data = await req.json();
   const orderNumber = `DL${Date.now()}`;
@@ -8,14 +10,15 @@ export async function POST(req: Request) {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-  // 後備網址：把整包資料用 base64url 編碼塞進網址（舊作法）。
-  // 當 Supabase 尚未設定，或寫入失敗時，仍可用這個連結正常顯示。
+  // 一律把整張表單資料 base64 編碼後塞進預覽連結。
+  // 預覽頁會在手機瀏覽器端直接解碼顯示，「完全不需要」再回資料庫讀取，
+  // 因此不受 Vercel ↔ Supabase 連線狀態影響，單子一定看得到。
   const encoded = Buffer.from(JSON.stringify(orderData)).toString('base64url');
-  const fallbackUrl = `${baseUrl}/preview?d=${encoded}`;
+  const previewUrl = `${baseUrl}/preview?d=${encoded}`;
 
-  let previewUrl = fallbackUrl;
+  // 仍嘗試把資料寫進 Supabase 作為存檔備份（best-effort）。
+  // 這一步失敗也「不影響」預覽連結，只是少了一筆資料庫備份而已。
   let dbError: string | null = null;
-
   if (supabaseEnabled) {
     try {
       const supabase = getSupabaseAdmin();
@@ -27,12 +30,9 @@ export async function POST(req: Request) {
         data: orderData,
       });
       if (error) throw error;
-      // 寫入成功 → 用短網址（只帶單號），預覽頁再從資料庫抓資料。
-      previewUrl = `${baseUrl}/preview?id=${orderNumber}`;
     } catch (e) {
       dbError = e instanceof Error ? e.message : String(e);
-      console.error('Supabase insert 失敗，改用 base64 連結：', dbError);
-      previewUrl = fallbackUrl;
+      console.error('Supabase 存檔失敗（不影響預覽連結）：', dbError);
     }
   }
 
