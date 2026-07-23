@@ -10,15 +10,14 @@ export async function POST(req: Request) {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-  // 一律把整張表單資料 base64 編碼後塞進預覽連結。
-  // 預覽頁會在手機瀏覽器端直接解碼顯示，「完全不需要」再回資料庫讀取，
-  // 因此不受 Vercel ↔ Supabase 連線狀態影響，單子一定看得到。
+  // 後備連結：把整張表單 base64 編碼塞進網址（較長，但不需資料庫也能顯示）。
   const encoded = Buffer.from(JSON.stringify(orderData)).toString('base64url');
-  const previewUrl = `${baseUrl}/preview?d=${encoded}`;
+  const fallbackUrl = `${baseUrl}/preview?d=${encoded}`;
 
-  // 仍嘗試把資料寫進 Supabase 作為存檔備份（best-effort）。
-  // 這一步失敗也「不影響」預覽連結，只是少了一筆資料庫備份而已。
+  // 預設用「短連結」：資料成功存進 Supabase 後，連結只帶單號。
+  let previewUrl = fallbackUrl;
   let dbError: string | null = null;
+
   if (supabaseEnabled) {
     try {
       const supabase = getSupabaseAdmin();
@@ -30,18 +29,31 @@ export async function POST(req: Request) {
         data: orderData,
       });
       if (error) throw error;
+      // 存檔成功 → 用短連結（預覽頁再用單號向 API 抓資料）。
+      previewUrl = `${baseUrl}/preview?id=${orderNumber}`;
     } catch (e) {
       dbError = e instanceof Error ? e.message : String(e);
-      console.error('Supabase 存檔失敗（不影響預覽連結）：', dbError);
+      console.error('Supabase 存檔失敗，改用自帶資料的長連結：', dbError);
+      previewUrl = fallbackUrl;
     }
   }
+
+  // 齒位（表單點選的牙齒），顯示在 LINE 訊息裡方便一眼確認。
+  const teeth = Array.isArray(data.teeth) ? data.teeth : [];
+  const teethLabel = teeth.length ? teeth.join('、') : '（未選）';
+
+  // 交件時間：若選「正確裝戴時間」，附上裝戴日期。
+  const timeLabel = data.deliveryTime === '正確裝戴時間'
+    ? `正確裝戴時間（${data.fittingDate || '未填日期'}）`
+    : data.deliveryTime;
 
   const message = `📋 新指示單 ${orderNumber}
 
 🏥 診所：${data.clinic}
 👨‍⚕️ 醫師：${data.doctor}
 🧑 患者：${data.patient}（${data.gender}）
-📅 交件日：${data.deliveryDate} ${data.deliveryTime}
+🦷 齒位：${teethLabel}
+📅 交件日：${data.deliveryDate} ${timeLabel}
 
 👉 點此查看並列印指示單：
 ${previewUrl}`;

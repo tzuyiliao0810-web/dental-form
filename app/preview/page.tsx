@@ -4,24 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import PrintableForm from './PrintableForm';
 
-// 預設示範資料：當沒有 id、沒有 d、或資料庫查不到時使用。
-const defaultData = {
-  orderNumber: '058438',
-  clinic: '心絡', doctor: '張', patient: '陳芸綾',
-  age: '', gender: '女',
-  receiptDate: '2026-06-23', deliveryDate: '2026-07-17', deliveryTime: '18:00前',
-  zirconiaType: 'Standard', zirconiaWork: ['Full Crown'],
-  emaxWork: [] as string[],
-  implantType: '', implantMaterial: '', screwCount: '', implantConnect: '',
-  other: ['3D Printer Model'],
-  gap: '正常', grooveStain: '中', toothColor: 'A2', porcelainGingiva: false,
-  screw: '', analog: '', transfer: '', abutment: '', scanBodies: '', tray: '',
-  implantBrand: '', implantSystem: '', implantSize: '',
-  toothNotes: '6 | 6', connection: '單顆',
-  notes: '手術導板\n口掃+LT\n做成一組目',
-};
-
-// 在瀏覽器端解 base64url（取代原本 Buffer.from 的伺服器端寫法）。
+// 在瀏覽器端解 base64url（對應送出時 Buffer.from(...).toString('base64url')）。
 function decodeBase64Url(encoded: string) {
   try {
     let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
@@ -38,21 +21,24 @@ function decodeBase64Url(encoded: string) {
   }
 }
 
+type State =
+  | { kind: 'loading' }
+  | { kind: 'ok'; data: any }
+  | { kind: 'empty' }        // 沒有帶任何參數
+  | { kind: 'notfound' };    // 有單號/資料但讀不到
+
 function PreviewInner() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const d = searchParams.get('d');
 
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<State>({ kind: 'loading' });
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-      // 1) 優先：在手機瀏覽器端即時向 API 要單號對應的資料。
-      //    每次都是瀏覽器重新發出的請求（cache: 'no-store'），
-      //    不管伺服器或 CDN 怎麼快取頁面本身都不影響這次抓到的資料。
+      // 1) 優先：用單號在手機端即時向 API 抓最新資料（每次都重新抓，不受快取影響）。
       if (id) {
         try {
           const res = await fetch(`/api/order/${encodeURIComponent(id)}`, {
@@ -61,31 +47,27 @@ function PreviewInner() {
           if (res.ok) {
             const json = await res.json();
             if (!cancelled && json?.data) {
-              setData(json.data);
-              setLoading(false);
+              setState({ kind: 'ok', data: json.data });
               return;
             }
           }
         } catch (e) {
           console.error('讀取訂單資料失敗：', e);
         }
+        // 有單號但讀不到（例如資料庫暫時無法連線）→ 顯示清楚提示，不顯示示範資料。
+        if (!cancelled) setState({ kind: 'notfound' });
+        return;
       }
 
-      // 2) 後備：舊的 base64 連結（同樣在瀏覽器端解碼，不經過伺服器）。
+      // 2) 後備：自帶資料的長連結（在瀏覽器端解碼，不經過資料庫）。
       if (d) {
         const decoded = decodeBase64Url(d);
-        if (!cancelled && decoded) {
-          setData(decoded);
-          setLoading(false);
-          return;
-        }
+        if (!cancelled) setState(decoded ? { kind: 'ok', data: decoded } : { kind: 'notfound' });
+        return;
       }
 
-      // 3) 最後後備：示範資料。
-      if (!cancelled) {
-        setData(defaultData);
-        setLoading(false);
-      }
+      // 3) 沒有任何參數 → 空白提示。
+      if (!cancelled) setState({ kind: 'empty' });
     }
 
     load();
@@ -94,7 +76,7 @@ function PreviewInner() {
     };
   }, [id, d]);
 
-  if (loading) {
+  if (state.kind === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
         載入中…
@@ -102,7 +84,24 @@ function PreviewInner() {
     );
   }
 
-  return <PrintableForm data={data} />;
+  if (state.kind === 'ok') {
+    return <PrintableForm data={state.data} />;
+  }
+
+  // empty / notfound：顯示清楚訊息，不再跳出示範資料。
+  const msg =
+    state.kind === 'notfound'
+      ? '找不到這張指示單的資料。連結可能有誤，或資料庫暫時無法連線，請稍後再試或聯繫牙技所。'
+      : '請從指示單連結開啟此頁面。';
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6">
+      <div className="text-center text-gray-600 max-w-md">
+        <div className="text-4xl mb-3">📋</div>
+        <p>{msg}</p>
+      </div>
+    </div>
+  );
 }
 
 export default function Preview() {
